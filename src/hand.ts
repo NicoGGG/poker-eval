@@ -1,12 +1,6 @@
 import { groupCardsByValue, insertHexDigit } from "./utils";
 
-export type HandStrength = {
-  handValue: HandValue;
-  valueHigh: CardValue;
-  highCards: Array<CardValue>;
-};
-
-export type HandStrengthHex = number;
+export type HandStrength = number;
 type HandValue =
   | 0x0 // High card
   | 0x1 // Pair
@@ -113,7 +107,7 @@ type HandStrengthReturn = {
  *  const result: HandStrengthHex = findBestHand(cards);
  *  console.log(result); // 0x2A4K0000 - Explanation: Two pairs with Aces over 4s with King kicker
  */
-export function findBestHand(cards: Array<Card>): HandStrengthHex {
+export function findBestHand(cards: Array<Card>): HandStrength {
   cards.sort((a, b) => b.value - a.value);
   const { handValue, handCardsValue, remainingCardsValue } =
     findBestHandStrength(cards);

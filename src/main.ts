@@ -1,13 +1,13 @@
 import {
   convertHand,
   findBestHand,
-  HandStrengthHex,
+  HandStrength,
   type Board,
   type PocketHand,
 } from "./hand";
 
 type WinningHand = {
-  handStrenght?: HandStrengthHex;
+  handStrength?: HandStrength;
   indexes: Array<number>;
 };
 /**
@@ -28,23 +28,23 @@ function pokerEval(
   pocketHands: Array<PocketHand>,
   board: Board,
 ): Array<number> {
-  const handsStrenght = pocketHands.map((hand) => {
+  const handsStrength = pocketHands.map((hand) => {
     const cards = convertHand(hand, board);
     return findBestHand(cards);
   });
-  const winIndex = handsStrenght.reduce(
+  const winIndex = handsStrength.reduce(
     (acc: WinningHand, hand, index) => {
-      if (!acc.handStrenght || acc.handStrenght < hand) {
+      if (!acc.handStrength || acc.handStrength < hand) {
         acc = {
-          handStrenght: hand,
+          handStrength: hand,
           indexes: [index],
         };
-      } else if (acc.handStrenght == hand) {
+      } else if (acc.handStrength == hand) {
         acc.indexes.push(index);
       }
       return acc;
     },
-    { handStrenght: undefined, indexes: [] } as WinningHand,
+    { handStrength: undefined, indexes: [] } as WinningHand,
   );
   const wins = pocketHands.map((_, index) =>
     winIndex.indexes.includes(index) ? 1 : 0,

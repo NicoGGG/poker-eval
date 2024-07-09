@@ -4,7 +4,7 @@ import {
   Card,
   PocketHand,
   Board,
-  HandStrengthHex,
+  HandStrength,
 } from "./hand";
 
 describe("convertHand", () => {
@@ -142,7 +142,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x000a9864);
   });
 
@@ -156,7 +156,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x120a9800);
   });
 
@@ -170,7 +170,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x1e0a9800);
   });
 
@@ -184,7 +184,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x262a0000);
   });
 
@@ -198,7 +198,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x320a9000);
   });
 
@@ -212,7 +212,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xa },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x40065432);
   });
 
@@ -226,7 +226,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xe },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x40054321);
   });
 
@@ -240,7 +240,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x500a8642);
   });
 
@@ -254,7 +254,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x62a00000);
   });
 
@@ -268,7 +268,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x720a0000);
   });
 
@@ -282,7 +282,7 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xa },
     ];
-    const result: HandStrengthHex = findBestHand(cards);
+    const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x80065432);
   });
 });
