@@ -1,5 +1,60 @@
 import { groupCardsByValue, insertHexDigit } from "./utils";
 
+export const deck: Array<CardRaw> = [
+  "2H",
+  "2D",
+  "2C",
+  "2S",
+  "3H",
+  "3D",
+  "3C",
+  "3S",
+  "4H",
+  "4D",
+  "4C",
+  "4S",
+  "5H",
+  "5D",
+  "5C",
+  "5S",
+  "6H",
+  "6D",
+  "6C",
+  "6S",
+  "7H",
+  "7D",
+  "7C",
+  "7S",
+  "8H",
+  "8D",
+  "8C",
+  "8S",
+  "9H",
+  "9D",
+  "9C",
+  "9S",
+  "TH",
+  "TD",
+  "TC",
+  "TS",
+  "JH",
+  "JD",
+  "JC",
+  "JS",
+  "QH",
+  "QD",
+  "QC",
+  "QS",
+  "KH",
+  "KD",
+  "KC",
+  "KS",
+  "AH",
+  "AD",
+  "AC",
+  "AS",
+];
+
 export type HandStrength = number;
 type HandValue =
   | 0x0 // High card
@@ -29,7 +84,7 @@ const highCardsMapping: Record<HandValue, number> = {
   0x7: 1,
   0x8: 5,
 };
-type CardValue =
+export type CardValue =
   | 0x0
   | 0x1
   | 0x2
@@ -140,7 +195,7 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
       ? ({ value: 0x1, suit: card.suit } as Card)
       : card;
   });
-  const straight = findStraight(cards) || findStraight(cardsAceLow)
+  const straight = findStraight(cards) || findStraight(cardsAceLow);
   if (straight) {
     const flush = straight.allCards[0].suit;
     if (straight.allCards.every((card) => card.suit === flush)) {
@@ -340,88 +395,4 @@ function findHighCards(
   const result = remainingCards.slice(0, highCardCount);
   result.push(...(new Array(5 - highCardCount).fill(0x0) as Array<CardValue>));
   return result.sort((a, b) => b - a);
-}
-
-/** Converts a hand and a board to an array of Card objects
- * This is specific to Texas Hold'em and work only for this game
- *
- * @param pocketHand - An array of strings representing cards held by a player
- * @param board - An array of strings representing the common cards of the board
- *
- * @returns An array of Card object, sorted by value descending
- *
- * @example
- * const pocketHand: PocketHand = ["2H"];
- * const board: Board = ["3D", "4C", "5S"];
- * const result: Array<Card> = convertHand(pocketHand, board);
- * console.log(result); // [{ suit: "S", value: 0x5 }, { suit: "C", value: 0x4 }, { suit: "D", value: 0x3 }, { suit: "H", value: 0x2 }]
- */
-export function convertHand(pocketHand: PocketHand, board: Board): Array<Card> {
-  return [...pocketHand, ...board]
-    .map((card) => convertCard(card))
-    .sort((a, b) => {
-      if (!(b.value - a.value)) {
-        return b.suit.localeCompare(a.suit);
-      }
-      return b.value - a.value;
-    });
-}
-
-/** Converts a card from a string to a Card object
- * @param cardRaw - A string representing a card
- *
- * @returns A Card object
- *
- * @example
- * const card = convertCard("2H");
- * console.log(card); // { suit: "H", value: 0x2 }
- */
-function convertCard(cardRaw: CardRaw): Card {
-  const suit = cardRaw[1].toUpperCase() as CardSuit;
-  const value = cardRaw[0].toUpperCase() as CardFigure;
-
-  if (!["H", "D", "C", "S"].includes(suit)) {
-    throw new Error(`Invalid suit: ${suit}`);
-  }
-  if (
-    !["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"].includes(
-      value,
-    )
-  ) {
-    throw new Error(`Invalid value: ${value}`);
-  }
-
-  const valueHex = convertCardValue(value);
-  return { suit, value: valueHex };
-}
-
-function convertCardValue(value: CardFigure): CardValue {
-  switch (value) {
-    case "2":
-      return 0x2;
-    case "3":
-      return 0x3;
-    case "4":
-      return 0x4;
-    case "5":
-      return 0x5;
-    case "6":
-      return 0x6;
-    case "7":
-      return 0x7;
-    case "8":
-      return 0x8;
-    case "9":
-      return 0x9;
-    case "T":
-      return 0xa;
-    case "J":
-      return 0xb;
-    case "Q":
-      return 0xc;
-    case "K":
-      return 0xd;
-    case "A":
-      return 0xe;
-  }
 }

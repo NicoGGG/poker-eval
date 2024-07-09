@@ -1,4 +1,4 @@
-import { insertHexDigit } from "./utils";
+import { insertHexDigit, shuffleArray } from "./utils";
 
 describe("insertHexDigit", () => {
   it("should correctly insert a single digit", () => {
@@ -50,5 +50,47 @@ describe("insertHexDigit", () => {
     original = insertHexDigit(original, 0xc);
     const result = insertHexDigit(original, 0xd);
     expect(result).toBe(0xabcd);
+  });
+});
+
+describe("shuffleArray", () => {
+  test("should return an array of the same length", () => {
+    const arr = [1, 2, 3, 4, 5];
+    const shuffledArr = shuffleArray(arr);
+    expect(shuffledArr.length).toBe(arr.length);
+  });
+
+  test("should contain the same elements as the original array", () => {
+    const arr = [1, 2, 3, 4, 5];
+    const shuffledArr = shuffleArray(arr);
+    expect(shuffledArr.sort()).toEqual(arr.sort());
+  });
+
+  test("should not return the array in the same order", () => {
+    const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const shuffledArr = shuffleArray(arr);
+    // There's a very small chance this test could fail if the shuffled array ends up being the same as the original.
+    expect(shuffledArr).not.toEqual(arr);
+    const shuffledArr2 = shuffleArray(arr);
+    expect(shuffledArr).not.toEqual(shuffledArr2);
+  });
+
+  test("should not mutate the original array", () => {
+    const arr = [1, 2, 3, 4, 5];
+    const arrCopy = [...arr];
+    shuffleArray(arr);
+    expect(arr).toEqual(arrCopy);
+  });
+
+  test("should handle empty arrays", () => {
+    const arr: Array<any> = [];
+    const shuffledArr = shuffleArray(arr);
+    expect(shuffledArr).toEqual([]);
+  });
+
+  test("should handle arrays with one element", () => {
+    const arr = [1];
+    const shuffledArr = shuffleArray(arr);
+    expect(shuffledArr).toEqual([1]);
   });
 });

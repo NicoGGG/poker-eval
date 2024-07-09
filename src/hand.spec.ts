@@ -1,17 +1,12 @@
-import {
-  findBestHand,
-  convertHand,
-  Card,
-  PocketHand,
-  Board,
-  HandStrength,
-} from "./hand";
+import { findBestHand, Card, PocketHand, Board, HandStrength } from "./hand";
+
+import { convertHand as convertHandHoldem } from "./holdem";
 
 describe("convertHand", () => {
   it("should convert a simple hand correctly", () => {
     const pocketHand: PocketHand = ["2H", "3D"];
     const board: Board = ["4C", "5S"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "S", value: 0x5 },
       { suit: "C", value: 0x4 },
@@ -23,7 +18,7 @@ describe("convertHand", () => {
   it("should sort the cards by value", () => {
     const pocketHand: PocketHand = ["KH", "2D"];
     const board: Board = ["5C", "AS"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "S", value: 0xe },
       { suit: "H", value: 0xd },
@@ -35,7 +30,7 @@ describe("convertHand", () => {
   it("should handle duplicate values correctly", () => {
     const pocketHand: PocketHand = ["3H", "3D"];
     const board: Board = ["3C", "3S"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "S", value: 0x3 },
       { suit: "H", value: 0x3 },
@@ -47,26 +42,26 @@ describe("convertHand", () => {
   it("should throw an error for invalid suit", () => {
     const pocketHand: PocketHand = ["2Z"];
     const board: Board = ["3H"];
-    expect(() => convertHand(pocketHand, board)).toThrow("Invalid suit: Z");
+    expect(() => convertHandHoldem(pocketHand, board)).toThrow("Invalid suit: Z");
   });
 
   it("should throw an error for invalid value", () => {
     const pocketHand: PocketHand = ["ZH"];
     const board: Board = ["3H"];
-    expect(() => convertHand(pocketHand, board)).toThrow("Invalid value: Z");
+    expect(() => convertHandHoldem(pocketHand, board)).toThrow("Invalid value: Z");
   });
 
   it("should handle empty input correctly", () => {
     const pocketHand: PocketHand = [];
     const board: Board = [];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([]);
   });
 
   it("should handle mixed pocket hand and board", () => {
     const pocketHand: PocketHand = ["2H"];
     const board: Board = ["3D", "4C", "5S"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "S", value: 0x5 },
       { suit: "C", value: 0x4 },
@@ -78,7 +73,7 @@ describe("convertHand", () => {
   it("should be case insensitive for card values", () => {
     const pocketHand: PocketHand = ["Ah"];
     const board: Board = ["Kd"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "H", value: 0xe },
       { suit: "D", value: 0xd },
@@ -102,7 +97,7 @@ describe("convertHand", () => {
       "AH",
     ];
     const board: Board = [];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "H", value: 0xe },
       { suit: "S", value: 0xd },
@@ -123,7 +118,7 @@ describe("convertHand", () => {
   it("should handle edge case with lowest and highest values", () => {
     const pocketHand: PocketHand = ["2H"];
     const board: Board = ["AD"];
-    const result: Array<Card> = convertHand(pocketHand, board);
+    const result: Array<Card> = convertHandHoldem(pocketHand, board);
     expect(result).toEqual([
       { suit: "D", value: 0xe },
       { suit: "H", value: 0x2 },
