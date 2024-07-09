@@ -72,6 +72,17 @@ describe("pokerEval with partial board (turn)", () => {
     const result = pokerEval(pocketHands, board);
     expect(result).toEqual([42, 2]);
   });
+
+  test("2 players, 0/20.45 win split with 79.55 ties chances", () => {
+    const pocketHands = [
+      ["Ah", "Qc"],
+      ["Qd", "Qs"],
+    ];
+    const board = ["As", "Kd", "Js", "Ts"];
+
+    const result = pokerEval(pocketHands, board);
+    expect(result).toEqual([35, 44]);
+  });
 });
 
 describe("pokerEval with partial board (flop)", () => {

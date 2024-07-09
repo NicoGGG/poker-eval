@@ -1,4 +1,8 @@
-import { groupCardsByValue, insertHexDigit } from "./utils";
+import {
+  groupCardsByValue,
+  insertHexDigit,
+  removeDuplicateValuesCards,
+} from "./utils";
 
 export const deck: Array<CardRaw> = [
   "2H",
@@ -195,10 +199,11 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
       ? ({ value: 0x1, suit: card.suit } as Card)
       : card;
   });
-  const straight = findStraight(cards) || findStraight(cardsAceLow);
-  if (straight) {
-    const flush = straight.allCards[0].suit;
-    if (straight.allCards.every((card) => card.suit === flush)) {
+
+  const flush = findFlush(cards);
+  if (flush) {
+    const straight = findStraight(flush.allCards);
+    if (straight) {
       return {
         handValue: 0x8,
         handCardsValue: [0x0, 0x0],
@@ -206,12 +211,12 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
         allCards: straight.allCards,
       };
     }
-    return straight;
+    return flush;
   }
 
-  const flush = findFlush(cards);
-  if (flush) {
-    return flush;
+  const straight = findStraight(cards) || findStraight(cardsAceLow);
+  if (straight) {
+    return straight;
   }
 
   const quads = findQuads(cards);
@@ -292,7 +297,8 @@ function findFlush(cards: Array<Card>): HandStrengthReturn | null {
 }
 
 function findStraight(cards: Array<Card>): HandStrengthReturn | null {
-  const sortedCards = cards.sort((a, b) => b.value - a.value);
+  const noDuplicateCards = removeDuplicateValuesCards(cards);
+  const sortedCards = noDuplicateCards.sort((a, b) => b.value - a.value);
   for (let i = 0; i < sortedCards.length - 4; i++) {
     const straight = sortedCards.slice(i, i + 5);
     if (straight.length < 5) {

@@ -42,13 +42,17 @@ describe("convertHand", () => {
   it("should throw an error for invalid suit", () => {
     const pocketHand: PocketHand = ["2Z"];
     const board: Board = ["3H"];
-    expect(() => convertHandHoldem(pocketHand, board)).toThrow("Invalid suit: Z");
+    expect(() => convertHandHoldem(pocketHand, board)).toThrow(
+      "Invalid suit: Z",
+    );
   });
 
   it("should throw an error for invalid value", () => {
     const pocketHand: PocketHand = ["ZH"];
     const board: Board = ["3H"];
-    expect(() => convertHandHoldem(pocketHand, board)).toThrow("Invalid value: Z");
+    expect(() => convertHandHoldem(pocketHand, board)).toThrow(
+      "Invalid value: Z",
+    );
   });
 
   it("should handle empty input correctly", () => {
@@ -225,6 +229,20 @@ describe("findBestHand", () => {
     expect(result).toBe(0x40054321);
   });
 
+  it("should return the correct HandStrengthHex for a straight with only 1 pocket card", () => {
+    const cards: Array<Card> = [
+      { suit: "S", value: 0xe },
+      { suit: "D", value: 0xd },
+      { suit: "S", value: 0xb },
+      { suit: "S", value: 0xa },
+      { suit: "D", value: 0x4 },
+      { suit: "S", value: 0xc },
+      { suit: "C", value: 0xc },
+    ];
+    const result: HandStrength = findBestHand(cards);
+    expect(result).toBe(0x400edcba);
+  });
+
   it("should return the correct HandStrengthHex for a flush", () => {
     const cards: Array<Card> = [
       { suit: "H", value: 0x2 },
@@ -237,6 +255,20 @@ describe("findBestHand", () => {
     ];
     const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x500a8642);
+  });
+
+  it("should return the correct HandStrengthHex for a flush even if there is a straight possible", () => {
+    const cards: Array<Card> = [
+      { suit: "S", value: 0xe },
+      { suit: "D", value: 0xd },
+      { suit: "S", value: 0xb },
+      { suit: "S", value: 0xa },
+      { suit: "S", value: 0x4 },
+      { suit: "S", value: 0xc },
+      { suit: "C", value: 0xc },
+    ];
+    const result: HandStrength = findBestHand(cards);
+    expect(result).toBe(0x500ecba4);
   });
 
   it("should return the correct HandStrengthHex for a full house", () => {
@@ -276,6 +308,34 @@ describe("findBestHand", () => {
       { suit: "H", value: 0x6 },
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xa },
+    ];
+    const result: HandStrength = findBestHand(cards);
+    expect(result).toBe(0x80065432);
+  });
+
+  it("should return the correct HandStrengthHex for a royal flush with all cards on the board", () => {
+    const cards: Array<Card> = [
+      { suit: "S", value: 0xe },
+      { suit: "S", value: 0xd },
+      { suit: "H", value: 0xe },
+      { suit: "H", value: 0xd },
+      { suit: "H", value: 0xc },
+      { suit: "H", value: 0xb },
+      { suit: "H", value: 0xa },
+    ];
+    const result: HandStrength = findBestHand(cards);
+    expect(result).toBe(0x800edcba);
+  });
+
+  it("should return the correct HandStrengthHex for a straight flush with better flush on the board", () => {
+    const cards: Array<Card> = [
+      { suit: "H", value: 0xe },
+      { suit: "S", value: 0xd },
+      { suit: "H", value: 0x6 },
+      { suit: "H", value: 0x5 },
+      { suit: "H", value: 0x4 },
+      { suit: "H", value: 0x3 },
+      { suit: "H", value: 0x2 },
     ];
     const result: HandStrength = findBestHand(cards);
     expect(result).toBe(0x80065432);

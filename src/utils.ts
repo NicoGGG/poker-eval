@@ -10,6 +10,18 @@ export function insertHexDigit(original: number, newDigit: number): number {
   return result;
 }
 
+export function removeDuplicateValuesCards(cards: Card[]): Card[] {
+  const seenValues = new Set<CardValue>();
+  return cards.filter((card) => {
+    if (seenValues.has(card.value)) {
+      return false;
+    } else {
+      seenValues.add(card.value);
+      return true;
+    }
+  });
+}
+
 export function groupCardsByValue(cards: Array<Card>): Record<string, number> {
   const cardsValue = cards.map((card) => card.value);
   const grouped = cardsValue.reduce(
