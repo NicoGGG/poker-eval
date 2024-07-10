@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6", // Specify ECMAScript target version
-    "module": "es6", // Specify module code generation
+    "target": "es5", // Specify ECMAScript target version
+    "module": "commonjs", // Specify module code generation
     "moduleResolution": "node", // Specify module resolution strategy
+    "declaration": true, // Generates corresponding .d.ts file
     "strict": true, // Enable all strict type-checking options
     "esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules
     "skipLibCheck": true, // Skip type checking of declaration files
@@ -12,10 +13,14 @@
     "resolveJsonModule": true, // Include modules imported with .json extension
     "sourceMap": true, // Generates corresponding .map file
     "allowSyntheticDefaultImports": true, // Allow default imports from modules with no default export
-    "isolatedModules": true // Ensures that each file can be safely transpiled without relying on other imports
+    "isolatedModules": true, // Ensures that each file can be safely transpiled without relying on other imports
+    "baseUrl": "./", // Base directory to resolve non-absolute module names
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": [
-    "src/**/*" // Include all TypeScript files in the src directory
+    "src/**/*.ts" // Include all TypeScript files in the src directory
   ],
   "exclude": [
     "node_modules", // Exclude the node_modules directory

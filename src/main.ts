@@ -68,3 +68,4 @@ function pokerEval(
   }, [] as number[]);
 }
 export default pokerEval;
+module.exports = pokerEval;
