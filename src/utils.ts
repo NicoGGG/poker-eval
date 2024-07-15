@@ -22,6 +22,12 @@ export function removeDuplicateValuesCards(cards: Card[]): Card[] {
   });
 }
 
+/** Groups cards by their value
+ *
+ * @param cards - An array of cards
+ *
+ * @returns An object where the keys are the card values and the values are the number of cards with that value.
+ */
 export function groupCardsByValue(cards: Array<Card>): Record<string, number> {
   const cardsValue = cards.map((card) => card.value);
   const grouped = cardsValue.reduce(

@@ -1,5 +1,6 @@
 import { Card } from "./hand";
 import {
+  groupCardsByValue,
   insertHexDigit,
   removeDuplicateValuesCards,
   shuffleArray,
@@ -159,5 +160,76 @@ describe("removeDuplicateValuesCards", () => {
       { suit: "D", value: 0xd },
       { suit: "S", value: 0xc },
     ]);
+  });
+});
+
+describe("groupCardsByValue", () => {
+  it("should group cards by their value and count them correctly", () => {
+    const cards: Array<Card> = [
+      { suit: "H", value: 0x1 },
+      { suit: "D", value: 0x2 },
+      { suit: "C", value: 0x1 },
+      { suit: "S", value: 0x3 },
+      { suit: "H", value: 0x2 },
+      { suit: "D", value: 0x2 },
+    ];
+
+    const result = groupCardsByValue(cards);
+    expect(result).toEqual({
+      "1": 2,
+      "2": 3,
+      "3": 1,
+    });
+  });
+
+  it("should return an empty object for an empty array", () => {
+    const cards: Array<Card> = [];
+
+    const result = groupCardsByValue(cards);
+    expect(result).toEqual({});
+  });
+
+  it("should handle cards with only one value", () => {
+    const cards: Array<Card> = [
+      { suit: "H", value: 0x5 },
+      { suit: "D", value: 0x5 },
+      { suit: "C", value: 0x5 },
+    ];
+
+    const result = groupCardsByValue(cards);
+    expect(result).toEqual({
+      "5": 3,
+    });
+  });
+
+  it("should handle a case with all unique values", () => {
+    const cards: Array<Card> = [
+      { suit: "H", value: 0x1 },
+      { suit: "D", value: 0x2 },
+      { suit: "C", value: 0x3 },
+      { suit: "S", value: 0x4 },
+    ];
+
+    const result = groupCardsByValue(cards);
+    expect(result).toEqual({
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+    });
+  });
+
+  it("should handle cards with the maximum value", () => {
+    const cards: Array<Card> = [
+      { suit: "H", value: 0xe },
+      { suit: "D", value: 0xe },
+      { suit: "C", value: 0xe },
+      { suit: "S", value: 0xe },
+    ];
+
+    const result = groupCardsByValue(cards);
+    expect(result).toEqual({
+      "14": 4,
+    });
   });
 });

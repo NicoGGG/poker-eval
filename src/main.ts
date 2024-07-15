@@ -1,14 +1,9 @@
-import {
-  findBestHand,
-  HandStrength,
-  type Board,
-  type PocketHand,
-} from "./hand";
+import { findBestHand, type Board, type PocketHand } from "./hand";
 
 import { convertHand, generatePossibleBoards } from "./holdem";
 
 type WinningHand = {
-  handStrength?: HandStrength;
+  handStrength?: number;
   indexes: Array<number>;
 };
 /**

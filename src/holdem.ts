@@ -36,22 +36,17 @@ export function generatePossibleBoards(
     (card) => !initialBoard.includes(card) && !allPocketCards.includes(card),
   );
   const possibleBoards: Array<Board> = [];
+  // River
   if (initialBoard.length === 5) {
     possibleBoards.push(initialBoard);
-    return possibleBoards;
   }
-  if (!initialBoard.length) {
-    for (let i = 0; i < 10000; i++) {
-      let shuffledDeck = shuffleArray(remainingCards);
-      let { newBoard } = generateBoard(initialBoard, shuffledDeck);
-      possibleBoards.push(newBoard);
-    }
-  }
+  // Turn
   if (initialBoard.length === 4) {
     remainingCards.forEach((card) => {
       possibleBoards.push([...initialBoard, card]);
     });
   }
+  // Flop
   if (initialBoard.length === 3) {
     const remainingCardsCount = remainingCards.length;
     for (let i = 0; i < remainingCardsCount; i++) {
@@ -63,6 +58,14 @@ export function generatePossibleBoards(
       remainingCards.forEach((card) => {
         possibleBoards.push([...subPossibleBoard, card]);
       });
+    }
+  }
+  // Preflop
+  if (!initialBoard.length) {
+    for (let i = 0; i < 10000; i++) {
+      let shuffledDeck = shuffleArray(remainingCards);
+      let { newBoard } = generateBoard(initialBoard, shuffledDeck);
+      possibleBoards.push(newBoard);
     }
   }
   return possibleBoards;

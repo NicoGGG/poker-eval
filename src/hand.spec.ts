@@ -1,4 +1,4 @@
-import { findBestHand, Card, PocketHand, Board, HandStrength } from "./hand";
+import { findBestHand, Card, PocketHand, Board } from "./hand";
 
 import { convertHand as convertHandHoldem } from "./holdem";
 
@@ -141,8 +141,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x000a9864);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x0a9864);
   });
 
   it("should return the correct HandStrengthHex for one pair", () => {
@@ -155,8 +155,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x120a9800);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x122a98);
   });
 
   it("should return the correct HandStrengthHex for one pair of Ace", () => {
@@ -169,8 +169,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x1e0a9800);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x1eea98);
   });
 
   it("should return the correct HandStrengthHex for two pairs", () => {
@@ -183,8 +183,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x262a0000);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x26622a);
   });
 
   it("should return the correct HandStrengthHex for three of a kind", () => {
@@ -197,8 +197,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x320a9000);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x3222a9);
   });
 
   it("should return the correct HandStrengthHex for a straight", () => {
@@ -211,8 +211,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xa },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x40065432);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x465432);
   });
 
   it("should return the correct HandStrengthHex for a straight with Ace Low", () => {
@@ -225,8 +225,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xe },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x40054321);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x454321);
   });
 
   it("should return the correct HandStrengthHex for a straight with only 1 pocket card", () => {
@@ -239,8 +239,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0xc },
       { suit: "C", value: 0xc },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x400edcba);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x4edcba);
   });
 
   it("should return the correct HandStrengthHex for a flush", () => {
@@ -253,8 +253,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x500a8642);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x5a8642);
   });
 
   it("should return the correct HandStrengthHex for a flush even if there is a straight possible", () => {
@@ -267,8 +267,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0xc },
       { suit: "C", value: 0xc },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x500ecba4);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x5ecba4);
   });
 
   it("should return the correct HandStrengthHex for a full house", () => {
@@ -281,8 +281,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x62a00000);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x6222aa);
   });
 
   it("should return the correct HandStrengthHex for four of a kind", () => {
@@ -295,8 +295,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0x3 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x720a0000);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x72222a);
   });
 
   it("should return the correct HandStrengthHex for a straight flush", () => {
@@ -309,8 +309,8 @@ describe("findBestHand", () => {
       { suit: "S", value: 0x9 },
       { suit: "C", value: 0xa },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x80065432);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x865432);
   });
 
   it("should return the correct HandStrengthHex for a royal flush with all cards on the board", () => {
@@ -323,8 +323,8 @@ describe("findBestHand", () => {
       { suit: "H", value: 0xb },
       { suit: "H", value: 0xa },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x800edcba);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x8edcba);
   });
 
   it("should return the correct HandStrengthHex for a straight flush with better flush on the board", () => {
@@ -337,7 +337,7 @@ describe("findBestHand", () => {
       { suit: "H", value: 0x3 },
       { suit: "H", value: 0x2 },
     ];
-    const result: HandStrength = findBestHand(cards);
-    expect(result).toBe(0x80065432);
+    const result = findBestHand(cards);
+    expect(result).toBe(0x865432);
   });
 });

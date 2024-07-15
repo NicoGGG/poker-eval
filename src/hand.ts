@@ -59,7 +59,6 @@ export const deck: Array<CardRaw> = [
   "AS",
 ];
 
-export type HandStrength = number;
 type HandValue =
   | 0x0 // High card
   | 0x1 // Pair
@@ -89,7 +88,6 @@ const highCardsMapping: Record<HandValue, number> = {
   0x8: 5,
 };
 export type CardValue =
-  | 0x0
   | 0x1
   | 0x2
   | 0x3
@@ -130,9 +128,9 @@ export type PocketHand = Array<CardRaw>;
 export type Board = Array<CardRaw>;
 type HandStrengthReturn = {
   handValue: HandValue;
-  handCardsValue: Array<CardValue>; // The values of the cards that make up the hand (e.g. the pair, the trips, etc.) Always sorted in descending order and of length 2. If there is only one card, the second value is 0x0
-  remainingCardsValue: Array<CardValue>; // The values of the cards that make up the remaining cards. Always sorted in descending order and of length 5. If there are less than 5 cards, the remaining values are 0x0
-  allCards: Array<Card>;
+  handCardsValue: Array<CardValue>; // The values of the cards that make up the hand (e.g. the pair, the trips, etc.) Always sorted in descending order
+  remainingCardsValue: Array<CardValue>; // The values of the cards that make up the remaining cards. Always sorted in descending order
+  allCards?: Array<Card>; // Only used for flush to check if it is also a straight
 };
 
 /**
@@ -166,24 +164,16 @@ type HandStrengthReturn = {
  *  const result: HandStrengthHex = findBestHand(cards);
  *  console.log(result); // 0x2A4K0000 - Explanation: Two pairs with Aces over 4s with King kicker
  */
-export function findBestHand(cards: Array<Card>): HandStrength {
+export function findBestHand(cards: Array<Card>): number {
+  // cards should be sorted if generated with convertHand function, but sort again for garantee
   cards.sort((a, b) => b.value - a.value);
   const { handValue, handCardsValue, remainingCardsValue } =
     findBestHandStrength(cards);
-  const highCards = findHighCards(remainingCardsValue, handValue);
-  if (handCardsValue.length !== 2) {
-    throw new Error("Hand cards value must be of length 2");
-  }
-  if (highCards.length !== 5) {
-    throw new Error("Remaining cards value must be of length 5");
-  }
   let result = handValue as number;
-  for (let i = 0; i < 2; i++) {
-    result = insertHexDigit(result, handCardsValue[i]);
-  }
-  for (let i = 0; i < 5; i++) {
-    result = insertHexDigit(result, highCards[i]);
-  }
+  result = [...handCardsValue, ...remainingCardsValue].reduce((acc, value) => {
+    acc = insertHexDigit(acc, value);
+    return acc;
+  }, result as number);
 
   return result;
 }
@@ -194,20 +184,22 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
   // 3. Check for trips => full house
   // 4. Check for pair => two pairs
 
-  const cardsAceLow = cards.map((card) => {
-    return card.value === 0xe
-      ? ({ value: 0x1, suit: card.suit } as Card)
-      : card;
-  });
+  const cardsAceLow = cards
+    .map((card) => {
+      return card.value === 0xe
+        ? ({ value: 0x1, suit: card.suit } as Card)
+        : card;
+    })
+    .sort((a, b) => b.value - a.value);
 
   const flush = findFlush(cards);
   if (flush) {
-    const straight = findStraight(flush.allCards);
+    const straight = findStraight(flush.allCards!);
     if (straight) {
       return {
         handValue: 0x8,
-        handCardsValue: [0x0, 0x0],
-        remainingCardsValue: straight.allCards.map((card) => card.value),
+        handCardsValue: [],
+        remainingCardsValue: straight.allCards!.map((card) => card.value),
         allCards: straight.allCards,
       };
     }
@@ -233,9 +225,8 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
     if (pair) {
       return {
         handValue: 0x6,
-        handCardsValue: [trips.handCardsValue[0], pair.handCardsValue[0]],
-        remainingCardsValue: pair.remainingCardsValue,
-        allCards: trips.allCards,
+        handCardsValue: [...trips.handCardsValue, ...pair.handCardsValue],
+        remainingCardsValue: findHighCards(pair.remainingCardsValue, 0x6), // This could be a hardcoded [] for simplicity
       };
     }
     return trips;
@@ -248,11 +239,11 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
     );
     const secondPair = findPair(remainingCards);
     if (secondPair) {
+      const kicker = findHighCards(secondPair.remainingCardsValue, 0x2);
       return {
         handValue: 0x2,
-        handCardsValue: [pair.handCardsValue[0], secondPair.handCardsValue[0]],
-        remainingCardsValue: secondPair.remainingCardsValue,
-        allCards: [...secondPair.allCards],
+        handCardsValue: [...pair.handCardsValue, ...secondPair.handCardsValue],
+        remainingCardsValue: kicker,
       };
     }
     return pair;
@@ -264,9 +255,8 @@ function findBestHandStrength(cards: Array<Card>): HandStrengthReturn {
   );
   return {
     handValue: 0x0,
-    handCardsValue: [0x0, 0x0],
+    handCardsValue: [],
     remainingCardsValue: highCards,
-    allCards: cards.filter((card) => highCards.includes(card.value)),
   };
 }
 
@@ -290,7 +280,7 @@ function findFlush(cards: Array<Card>): HandStrengthReturn | null {
   const flushCards = cards.filter((card) => card.suit === flushSuit[0]);
   return {
     handValue: 0x5,
-    handCardsValue: [0x0, 0x0],
+    handCardsValue: [],
     remainingCardsValue: flushCards.map((card) => card.value),
     allCards: flushCards,
   };
@@ -298,24 +288,23 @@ function findFlush(cards: Array<Card>): HandStrengthReturn | null {
 
 function findStraight(cards: Array<Card>): HandStrengthReturn | null {
   const noDuplicateCards = removeDuplicateValuesCards(cards);
-  const sortedCards = noDuplicateCards.sort((a, b) => b.value - a.value);
-  for (let i = 0; i < sortedCards.length - 4; i++) {
-    const straight = sortedCards.slice(i, i + 5);
-    if (straight.length < 5) {
+  for (let i = 0; i < noDuplicateCards.length - 4; i++) {
+    const straightCards = noDuplicateCards.slice(i, i + 5);
+    if (straightCards.length < 5) {
       return null;
     }
-    const isStraight = straight.every((card, index) => {
+    const isStraight = straightCards.every((card, index) => {
       if (index === 0) {
         return true;
       }
-      return card.value === straight[index - 1].value - 1;
+      return card.value === straightCards[index - 1].value - 1;
     });
     if (isStraight) {
       return {
         handValue: 0x4,
-        handCardsValue: [0x0, 0x0],
-        remainingCardsValue: straight.map((card) => card.value),
-        allCards: straight,
+        handCardsValue: [],
+        remainingCardsValue: straightCards.map((card) => card.value),
+        allCards: straightCards,
       };
     }
   }
@@ -325,21 +314,20 @@ function findStraight(cards: Array<Card>): HandStrengthReturn | null {
 function findQuads(cards: Array<Card>): HandStrengthReturn | null {
   const cardCount = groupCardsByValue(cards);
   const cardCountArray = Object.entries(cardCount);
-  const quadKey = cardCountArray.find(([, value]) => {
+  const quadValue = cardCountArray.find(([, value]) => {
     return value === 4;
   });
-  if (quadKey) {
-    const quad = parseInt(quadKey[0]) as CardValue;
+  if (quadValue) {
+    const quad = parseInt(quadValue[0]) as CardValue;
     const remainingCards = cards
       .filter((card) => card.value !== quad)
       .map((card) => card.value);
+    const kicker = findHighCards(remainingCards, 0x7);
+    const handCardsValue = [quad, quad, quad, quad];
     return {
       handValue: 0x7,
-      handCardsValue: [quad, 0x0],
-      remainingCardsValue: remainingCards,
-      allCards: cards.filter(
-        (card) => card.value === quad || remainingCards.includes(card.value),
-      ),
+      handCardsValue,
+      remainingCardsValue: kicker,
     };
   }
 
@@ -348,21 +336,23 @@ function findQuads(cards: Array<Card>): HandStrengthReturn | null {
 
 function findTrips(cards: Array<Card>): HandStrengthReturn | null {
   const cardsValueGrouped = groupCardsByValue(cards);
-  const cardsValueArray = Object.entries(cardsValueGrouped);
+  const cardsValueArray = Object.entries(cardsValueGrouped).sort((a, b) => {
+    return b[1] - a[1];
+  });
   const tripsValueIndex = cardsValueArray.find(([, value]) => value === 3);
   if (tripsValueIndex) {
     const tripsValue = parseInt(tripsValueIndex[0]) as CardValue;
-    const remainingCards = cards.filter((card) => card.value !== tripsValue);
+    const remainingCards = cards
+      .filter((card) => card.value !== tripsValue)
+      .map((card) => card.value);
 
-    const allCards = cards.filter(
-      (card) => card.value === tripsValue || remainingCards.includes(card),
-    );
+    const handCardsValue = [tripsValue, tripsValue, tripsValue];
+    const kicker = findHighCards(remainingCards, 0x3);
 
     return {
       handValue: 0x3,
-      handCardsValue: [tripsValue, 0x0],
-      remainingCardsValue: remainingCards.map((card) => card.value),
-      allCards,
+      handCardsValue,
+      remainingCardsValue: kicker,
     };
   }
   return null;
@@ -376,17 +366,15 @@ function findPair(cards: Array<Card>): HandStrengthReturn | null {
   const pairValueIndex = cardsValueArray.find(([, value]) => value === 2);
   if (pairValueIndex) {
     const pairValue = parseInt(pairValueIndex[0]) as CardValue;
-    const remainingCards = cards.filter((card) => card.value !== pairValue);
-
-    const allCards = cards.filter(
-      (card) => card.value === pairValue || remainingCards.includes(card),
-    );
+    const remainingCards = cards
+      .filter((card) => card.value !== pairValue)
+      .map((card) => card.value);
+    const kicker = findHighCards(remainingCards, 0x1);
 
     return {
       handValue: 0x1,
-      handCardsValue: [pairValue, 0x0],
-      remainingCardsValue: remainingCards.map((card) => card.value),
-      allCards,
+      handCardsValue: [pairValue, pairValue],
+      remainingCardsValue: kicker,
     };
   }
 
@@ -399,6 +387,5 @@ function findHighCards(
 ): Array<CardValue> {
   const highCardCount = highCardsMapping[handValue];
   const result = remainingCards.slice(0, highCardCount);
-  result.push(...(new Array(5 - highCardCount).fill(0x0) as Array<CardValue>));
   return result.sort((a, b) => b - a);
 }
